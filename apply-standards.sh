@@ -450,9 +450,9 @@ create_branch_and_pr() {
   git commit --no-verify -m "$PR_TITLE"
   git push -u origin "$BRANCH_NAME" --force
 
-  # Create PR (skip if one already exists)
-  if gh pr view "$BRANCH_NAME" --repo "$github_repo" > /dev/null 2>&1; then
-    log "PR already exists, updated branch"
+  # Create PR (skip if an open one already exists)
+  if gh pr list --repo "$github_repo" --head "$BRANCH_NAME" --state open --json number | grep -q 'number'; then
+    log "PR already exists and open, updated branch"
   else
     gh pr create \
       --repo "$github_repo" \
