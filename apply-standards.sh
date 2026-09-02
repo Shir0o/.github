@@ -174,6 +174,49 @@ migrate_agent_docs() {
   [[ -d "$repo_dir/.agents" ]] && rmdir "$repo_dir/.agents" 2>/dev/null || true
 }
 
+# ─── Clean legacy changelog sections from PROJECT.md ─────────────────────────
+
+clean_project_md() {
+  local repo_dir="$1"
+  local project_md="$repo_dir/PROJECT.md"
+
+  [[ ! -f "$project_md" ]] && return
+
+  if grep -qi "changelog" "$project_md"; then
+    if $DRY_RUN; then
+      log "WOULD CLEAN legacy changelog sections from PROJECT.md"
+    else
+      python3 -c "
+import re
+with open('$project_md', 'r') as f:
+    content = f.read()
+pattern = r'##\s+(?:[0-9]+\.\s+)?Changelog Context & Tracking.*?(?=(?:\n##\s+|\Z))'
+cleaned = re.sub(pattern, '', content, flags=re.DOTALL)
+cleaned = re.sub(r'\n{3,}', '\n\n', cleaned).strip() + '\n'
+with open('$project_md', 'w') as f:
+    f.write(cleaned)
+"
+      log "Cleaned legacy changelog sections from PROJECT.md"
+    fi
+  fi
+}
+
+# ─── Remove CHANGELOG.md ─────────────────────────────────────────────────────
+
+remove_changelog() {
+  local repo_dir="$1"
+  local changelog="$repo_dir/CHANGELOG.md"
+
+  if [[ -f "$changelog" ]]; then
+    if $DRY_RUN; then
+      log "WOULD DELETE CHANGELOG.md"
+    else
+      rm "$changelog"
+      log "Deleted CHANGELOG.md"
+    fi
+  fi
+}
+
 # ─── Generate AGENTS.md from base + PROJECT.md ───────────────────────────────
 
 generate_agents_md() {
@@ -365,7 +408,7 @@ create_branch_and_pr() {
   done
 
   # Also stage deletions of old files
-  for f in "GEMINI.md" "CLAUDE.md" "agents.md" ".agents/AGENTS.md"; do
+  for f in "GEMINI.md" "CLAUDE.md" "agents.md" ".agents/AGENTS.md" "CHANGELOG.md"; do
     git rm --cached "$f" 2>/dev/null || true
   done
 
@@ -460,7 +503,13 @@ main() {
     # 1. Migrate old agent docs into PROJECT.md
     migrate_agent_docs "$repo_dir"
 
-    # 2. Generate AGENTS.md from base + PROJECT.md
+    # 2. Clean legacy changelog sections from PROJECT.md
+    clean_project_md "$repo_dir"
+
+    # 3. Remove CHANGELOG.md
+    remove_changelog "$repo_dir"
+
+    # 4. Generate AGENTS.md from base + PROJECT.md
     generate_agents_md "$repo_dir"
 
     # 3. Apply CODEOWNERS
