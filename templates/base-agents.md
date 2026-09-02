@@ -7,26 +7,62 @@ Behavioral guidelines to maximize code quality, prevent regressions, and minimiz
 
 ---
 
-## 1. Think & Clarify Before Coding
-- **State Assumptions & Tradeoffs**: Surface ambiguity early. Do not silently pick an implementation path if alternate approaches exist.
-- **Cost & Token Efficiency**: Avoid unnecessary tool calls, large file dumps, or speculative iterations.
+## 1. Think Before Coding
 
-## 2. Simplicity First & Surgical Changes
-- **Targeted Edits**: Touch only what is necessary to fulfill the request. Every changed line must trace directly to the user requirement.
-- **No Over-Engineering**: Avoid speculative features, unnecessary abstractions, or unrequested configuration options.
-- **No Mock Data**: Always wire real data from the backend, props, or state. Never hardcode fake/mock data in component logic.
-- **Clean Up Own Mess**: Remove only imports, variables, and code introduced or made unused by your changes. Do not touch pre-existing dead code.
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
 
-## 3. Test-Driven Development (TDD) & Quality
-- **TDD First**: Follow Red → Green → Refactor. Write or update unit tests before writing implementation code.
-- **Coverage & Ratcheting**: Enforce a minimum 80% test coverage threshold. Thresholds must never be lowered; only ratchet upwards as coverage improves.
-- **Goal Verification**: Transform tasks into verifiable goals (e.g. reproducing a bug via test first, ensuring all unit tests pass after).
+Before implementing:
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them - don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
 
-## 4. Commits & Pre-PR Gate
-- **Commits**: Follow Conventional Commits format (e.g., `feat(auth): add MFA`, `fix(nav): align dropdown arrow`).
-- **Pre-PR Gate**: Before creating or pushing a PR, run local CI pipeline steps in order and fix all failures:
+## 2. Simplicity First
 
-> **Note**: See `PROJECT.md` for the exact commands for this repo.
+**Minimum code that solves the problem. Nothing speculative.**
 
-- **Fix, don't skip**: Do not push with failing lints, build errors, or test coverage drops.
-- **Signature Verification**: Always match actual function signatures across callers when modifying utility functions.
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
+
+Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+
+## 3. Surgical Changes
+
+**Touch only what you must. Clean up only your own mess.**
+
+When editing existing code:
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it - don't delete it.
+
+When your changes create orphans:
+- Remove imports/variables/functions that YOUR changes made unused.
+- Don't remove pre-existing dead code unless asked.
+
+The test: Every changed line should trace directly to the user's request.
+
+## 4. Goal-Driven Execution
+
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+For multi-step tasks, state a brief plan:
+```
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
+```
+
+Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+---
+
+**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.

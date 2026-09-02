@@ -174,7 +174,7 @@ migrate_agent_docs() {
   [[ -d "$repo_dir/.agents" ]] && rmdir "$repo_dir/.agents" 2>/dev/null || true
 }
 
-# ─── Clean legacy changelog sections from PROJECT.md ─────────────────────────
+# ─── Clean legacy changelog sections & deduplicate PROJECT.md ─────────────────
 
 clean_project_md() {
   local repo_dir="$1"
@@ -182,22 +182,40 @@ clean_project_md() {
 
   [[ ! -f "$project_md" ]] && return
 
-  if grep -qi "changelog" "$project_md"; then
-    if $DRY_RUN; then
-      log "WOULD CLEAN legacy changelog sections from PROJECT.md"
-    else
-      python3 -c "
+  if $DRY_RUN; then
+    log "WOULD CLEAN legacy changelog & deduplicate PROJECT.md"
+  else
+    python3 -c "
 import re
+
 with open('$project_md', 'r') as f:
     content = f.read()
+
+# Strip changelog sections
 pattern = r'##\s+(?:[0-9]+\.\s+)?Changelog Context & Tracking.*?(?=(?:\n##\s+|\Z))'
-cleaned = re.sub(pattern, '', content, flags=re.DOTALL)
+content = re.sub(pattern, '', content, flags=re.DOTALL)
+
+with open('$TEMPLATES/base-agents.md', 'r') as f:
+    base_content = f.read()
+
+# Lines to filter out if they are duplicate base rules
+base_lines = set(line.strip() for line in base_content.splitlines() if line.strip() and not line.strip().startswith('# AGENTS.md') and not line.strip().startswith('<!--') and not line.strip() == '---')
+
+lines = content.splitlines()
+remaining = []
+for l in lines:
+    if l.strip() in base_lines:
+        continue
+    remaining.append(l)
+
+cleaned = '\n'.join(remaining)
 cleaned = re.sub(r'\n{3,}', '\n\n', cleaned).strip() + '\n'
+
+# If file only has the header comments or is empty, keep minimal header or remove
 with open('$project_md', 'w') as f:
     f.write(cleaned)
 "
-      log "Cleaned legacy changelog sections from PROJECT.md"
-    fi
+    log "Cleaned legacy changelog and deduplicated PROJECT.md"
   fi
 }
 
