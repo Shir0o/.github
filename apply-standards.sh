@@ -450,7 +450,7 @@ main() {
       pushd "$repo_dir" > /dev/null
       local default_branch
       default_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main")
-      git checkout "$default_branch" 2>/dev/null || git checkout main
+      git checkout -f "$default_branch" 2>/dev/null || git checkout -f main
       git pull --rebase origin "$default_branch" 2>/dev/null || true
       git branch -D "$BRANCH_NAME" 2>/dev/null || true
       git checkout -b "$BRANCH_NAME"

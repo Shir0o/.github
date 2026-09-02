@@ -17,17 +17,14 @@ Behavioral guidelines to maximize code quality, prevent regressions, and minimiz
 - **No Mock Data**: Always wire real data from the backend, props, or state. Never hardcode fake/mock data in component logic.
 - **Clean Up Own Mess**: Remove only imports, variables, and code introduced or made unused by your changes. Do not touch pre-existing dead code.
 
-## 3. Targeted Changelog Context & Tracking
-- **Selective Reading**: Do NOT read the entire `CHANGELOG.md` file (which can be large). Check only recent entries, the `[Unreleased]` section, or search for sections relevant to the code being modified to prevent regressions.
-- **Update After Completion**: Append a concise bullet point under `[Unreleased]` in `CHANGELOG.md` summarizing core changes added, modified, or fixed.
-
-## 4. Test-Driven Development (TDD) & Quality
+## 3. Test-Driven Development (TDD) & Quality
 - **TDD First**: Follow Red → Green → Refactor. Write or update unit tests before writing implementation code.
 - **Coverage & Ratcheting**: Enforce a minimum 80% test coverage threshold. Thresholds must never be lowered; only ratchet upwards as coverage improves.
 - **Goal Verification**: Transform tasks into verifiable goals (e.g. reproducing a bug via test first, ensuring all unit tests pass after).
 
-## 5. Pre-PR Gate
-Before creating or pushing a PR, run local CI pipeline steps in order and fix all failures:
+## 4. Commits & Pre-PR Gate
+- **Commits**: Follow Conventional Commits format (e.g., `feat(auth): add MFA`, `fix(nav): align dropdown arrow`).
+- **Pre-PR Gate**: Before creating or pushing a PR, run local CI pipeline steps in order and fix all failures:
 
 > **Note**: See `PROJECT.md` for the exact commands for this repo.
 
