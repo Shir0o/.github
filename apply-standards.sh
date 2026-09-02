@@ -509,10 +509,12 @@ main() {
     # Switch to clean branch on default branch first
     if ! $DRY_RUN; then
       pushd "$repo_dir" > /dev/null
+      git rebase --abort 2>/dev/null || git merge --abort 2>/dev/null || true
       local default_branch
       default_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main")
       git checkout -f "$default_branch" 2>/dev/null || git checkout -f main
-      git pull --rebase origin "$default_branch" 2>/dev/null || true
+      git fetch origin "$default_branch" 2>/dev/null || true
+      git reset --hard "origin/$default_branch" 2>/dev/null || true
       git branch -D "$BRANCH_NAME" 2>/dev/null || true
       git checkout -b "$BRANCH_NAME"
       popd > /dev/null
