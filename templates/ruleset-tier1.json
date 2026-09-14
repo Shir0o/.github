@@ -33,8 +33,7 @@
       "parameters": {
         "strict_required_status_checks_policy": true,
         "required_status_checks": [
-          { "context": "Analyze & Test" },
-          { "context": "Lint & Test" }
+          { "context": "__CI_CHECK__" }
         ]
       }
     },
