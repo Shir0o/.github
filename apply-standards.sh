@@ -367,7 +367,7 @@ apply_codeql() {
 # ─── Apply branch ruleset ────────────────────────────────────────────────────
 
 apply_ruleset() {
-  local repo_dir="$1" tier="$2"
+  local repo_dir="$1" tier="$2" framework="${3:-}"
   local rulesets_dir="$repo_dir/.github/rulesets"
 
   local template
@@ -393,6 +393,69 @@ apply_ruleset() {
   fi
 
   install_file "$template" "$rulesets_dir/main-branch-protection.json"
+
+  # The tier-1 ruleset must require the status checks this repo's CI actually
+  # reports. The template ships a placeholder because the names differ per repo:
+  # a repo that adopts the shared CI template reports one job (flutter ->
+  # "Analyze & Test", node -> "Lint & Test"), while a repo with a pre-existing
+  # ci.yml reports its own job names.
+  if [[ "$tier" == "1" ]] && ! $DRY_RUN && [[ -f "$rulesets_dir/main-branch-protection.json" ]]; then
+    python3 - "$rulesets_dir/main-branch-protection.json" "$repo_dir/.github/workflows/ci.yml" "$framework" <<'PY'
+import json, re, sys
+
+ruleset_path, ci_path, framework = sys.argv[1], sys.argv[2], sys.argv[3]
+
+
+def job_names(text):
+    lines = text.splitlines()
+    try:
+        start = next(
+            k for k, l in enumerate(lines)
+            if l.strip() == "jobs:" and not l.startswith(" ")
+        )
+    except StopIteration:
+        return []
+    jobs, current = [], None
+    for line in lines[start + 1:]:
+        if re.match(r"^  [A-Za-z0-9_.-]+:\s*$", line):
+            if current:
+                jobs.append(current)
+            current = {"key": line.strip()[:-1], "name": None}
+        elif current is not None and re.match(r"^    name:\s*\S", line):
+            if current["name"] is None:
+                current["name"] = line.split(":", 1)[1].strip().strip("\"'")
+        elif line and not line.startswith(" ") and not line.startswith("#"):
+            break
+    if current:
+        jobs.append(current)
+    return [job["name"] or job["key"] for job in jobs]
+
+
+checks = []
+try:
+    checks = job_names(open(ci_path).read())
+except OSError:
+    pass
+
+if not checks:
+    fallback = {"flutter": "Analyze & Test", "node": "Lint & Test", "eleventy": "Lint & Test"}
+    if framework in fallback:
+        checks = [fallback[framework]]
+
+with open(ruleset_path) as fh:
+    ruleset = json.load(fh)
+
+for rule in ruleset.get("rules", []):
+    if rule.get("type") == "required_status_checks":
+        rule["parameters"]["required_status_checks"] = [{"context": c} for c in checks]
+
+with open(ruleset_path, "w") as fh:
+    json.dump(ruleset, fh, indent=2)
+    fh.write("\n")
+
+print("  \u2192 Required status checks: " + (", ".join(checks) if checks else "(none)"))
+PY
+  fi
 }
 
 # ─── Git operations ──────────────────────────────────────────────────────────
@@ -553,7 +616,7 @@ main() {
     apply_codeql "$repo_dir" "$framework" "$has_functions"
 
     # 9. Apply branch ruleset
-    apply_ruleset "$repo_dir" "$tier"
+    apply_ruleset "$repo_dir" "$tier" "$framework"
 
     # 10. Create branch + commit + PR
     create_branch_and_pr "$repo_dir" "$github_repo"

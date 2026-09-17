@@ -14,9 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     environment: production
+    env:
+      TAG: ${{ github.ref_name }}
     steps:
       - name: Checkout repository at tag
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
 
@@ -43,19 +45,19 @@ jobs:
           echo "All release secrets present."
 
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
         with:
           channel: stable
           cache: true
 
       - name: Setup Ruby + Bundler for fastlane
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1
         with:
           ruby-version: '3.2'
           bundler-cache: false
@@ -89,9 +91,13 @@ jobs:
         id: vc
         run: |
           set -euo pipefail
-          tag="${{ github.ref_name }}"
+          tag="$TAG"
           ver="${tag#v}"
           ver="${ver%%-*}"
+          if [[ ! "$ver" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Tag '$tag' is not a plain semantic version (expected vMAJOR.MINOR.PATCH)."
+            exit 1
+          fi
           IFS='.' read -r major minor patch <<< "$ver"
           if [ -z "$major" ] || [ -z "$minor" ] || [ -z "$patch" ]; then
             echo "::error::Could not parse semver from tag '$tag'."
@@ -131,13 +137,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          existing_aab=$(gh release view "${{ github.ref_name }}" \
-            --repo "${{ github.repository }}" \
+          existing_aab=$(gh release view "$TAG" \
+            --repo "$GITHUB_REPOSITORY" \
             --json assets \
             --jq '.assets[] | select(.name | endswith(".aab")) | .name' \
             2>/dev/null || echo "")
-          existing_apk=$(gh release view "${{ github.ref_name }}" \
-            --repo "${{ github.repository }}" \
+          existing_apk=$(gh release view "$TAG" \
+            --repo "$GITHUB_REPOSITORY" \
             --json assets \
             --jq '.assets[] | select(.name | endswith(".apk")) | .name' \
             2>/dev/null || echo "")
@@ -149,7 +155,7 @@ jobs:
 
       - name: Attach AAB and APK to GitHub Release
         if: steps.check-existing.outputs.skip_attach != 'true'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           tag_name: ${{ github.ref_name }}
           generate_release_notes: false
@@ -161,7 +167,7 @@ jobs:
       - name: Determine if this is a pre-release tag
         id: prerelease
         run: |
-          tag="${{ github.ref_name }}"
+          tag="$TAG"
           if [[ "$tag" == *-rc* || "$tag" == *-beta* ]]; then
             echo "is_prerelease=true" >> "$GITHUB_OUTPUT"
           else
@@ -231,3 +237,12 @@ jobs:
           bundle exec fastlane play_upload
           rm -f fastlane/play-supply-credentials.json
           echo "Uploaded to Play Console internal track."
+
+      - name: Remove mounted credentials
+        if: always()
+        continue-on-error: true
+        run: |
+          rm -f fastlane/play-supply-credentials.json
+          rm -f android/key.properties
+          rm -f android/app/google-services.json
+          rm -rf "$HOME/.keystores"
