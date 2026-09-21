@@ -63,6 +63,20 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
+## 5. Legal & Regulatory Compliance (US & California)
+
+**Prevent statutory exposure before writing or shipping features.**
+See full standards in [docs/standards/legal-compliance.md](docs/standards/legal-compliance.md).
+
+Before introducing new features, enforce these gates:
+- **COPPA (Age Gating)**: If collecting personal info or public user sign-ups, require a neutral age check. Never collect PII from under-13 users without parental consent.
+- **CIPA / Wiretapping (Session Replay)**: Do not add session recording/replay scripts (Clarity, FullStory, LogRocket) without explicit opt-in. Mask all input fields at the capture layer.
+- **CAN-SPAM (Emails)**: Every email template must include a valid physical postal address and a working 1-click unsubscribe/opt-out mechanism.
+- **California ARL (Subscriptions)**: Auto-renewal terms, recurring price, and cancel instructions must appear right next to the checkout/subscribe button.
+- **Privacy & CDNs (Google Fonts)**: Self-host web fonts and static resources locally; do not link remote `fonts.googleapis.com` CDNs that leak user IP addresses.
+- **DMCA Safe Harbor**: If hosting user-generated uploads, ensure designated DMCA agent details and takedown procedures are in place.
+
 ---
 
-**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, zero regulatory compliance gaps, and clarifying questions come before implementation rather than after mistakes.
+
