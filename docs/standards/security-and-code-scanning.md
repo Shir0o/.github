@@ -121,16 +121,17 @@ Before changing any private repository's visibility to public, execute the follo
 | `Shir0o/diary` | `~/diary` | Extended | Enabled | Enabled | Enabled |
 | `Shir0o/wave` | `~/wave` | Extended | Enabled | Enabled | Enabled |
 | `Shir0o/cisa-campus-work-tracker` | `~/cisa-campus-work-tracker` | Extended | Enabled | Enabled | Enabled |
+| `Shir0o/sleep-journal` | `~/sleep-journal` | Extended | Enabled | Enabled | Enabled |
+| `Shir0o/inventory` | `~/inventory` | Extended | Enabled | Enabled | Enabled |
+| `Shir0o/shared-calendar` | `~/shared-calendar` | Extended | Enabled | Enabled | Enabled |
 
 ### Private Repositories (Free Tools Only)
 
 | Repository | Local Path | Dependabot Alerts | Dependabot PRs | GHAS / CodeQL |
 | :--- | :--- | :--- | :--- | :--- |
 | `Shir0o/csa` | `~/csa` | Enabled | Enabled | Kept Free (Disabled) |
-| `Shir0o/sleep-journal` | `~/sleep-journal` | Enabled | Enabled | Kept Free (Disabled) |
 | `Shir0o/idle` | `~/idle` | Enabled | Enabled | Kept Free (Disabled) |
 | `Shir0o/idle-flame` | `~/idle-flame` | Enabled | Enabled | Kept Free (Disabled) |
 | `Shir0o/notes` | `~/notes` | Enabled | Enabled | Kept Free (Disabled) |
-| `Shir0o/inventory` | `~/inventory` | Enabled | Enabled | Kept Free (Disabled) |
 | `Shir0o/helpful-scripts` | `~/helpful-scripts` | Enabled | Enabled | Kept Free (Disabled) |
-| `Shir0o/shared-calendar` | `~/shared-calendar` | Enabled | Enabled | Kept Free (Disabled) |
+
