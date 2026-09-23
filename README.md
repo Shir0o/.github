@@ -115,3 +115,11 @@ The script manages repos in two tiers:
   `attd`, `bible-read`, `cisa-campus-work-tracker`, `bnpb`, `auto-vol`, `cleaning-tracker`, `diary`, `wave`, `road-song`, `idle-flame`
 - **Tier 2 (Lightweight)**: Experiments/scripts with baseline `AGENTS.md`, Dependabot, and lightweight branch rulesets.
   `sleep-journal`, `idle`, `csa`, `package-maker`, `notes`, `inventory`, `circle`, `shared-calendar`, `helpful-scripts`
+
+---
+
+## Security & Code Scanning
+
+For detailed policies, free tool availability, and onboarding scripts for future repositories (CodeQL, Copilot Autofix, Dependabot, and Secret Scanning), see:
+- [`docs/standards/security-and-code-scanning.md`](docs/standards/security-and-code-scanning.md)
+
