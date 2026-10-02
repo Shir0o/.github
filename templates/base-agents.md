@@ -63,10 +63,29 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
-## 5. Legal & Regulatory Compliance (US & California)
+## 5. Screen Captures and Verification
+
+**Screenshots only for visual changes (1–2 of final state). Never record video. Skip captures for logic.**
+
+- **Logic-only tasks**: Skip all captures and app launches altogether. Verify exclusively through automated test suites, compiler/type checks, linting, and static analysis.
+- **Visual changes (shapes, effects, UI)**:
+  - Take **1–2 screenshots of the final state only** to confirm what changed on screen.
+  - **No videos or screen recordings**, and do not capture every combination or intermediate state.
+  - The user performs a short manual playtest at milestones (e.g. after a ticket lands), rather than agents recording or continuously running the app.
+
+## 6. Sequential CPU-Intensive Operations & Tests
+
+**Never run tests or heavy operations concurrently. Run them sequentially.**
+
+To prevent host resource exhaustion, thermal throttling, process timeouts, and lock contention:
+- **No concurrent test runs**: Never execute test commands (e.g. `flutter test`, `npm test`, `jest`, `pytest`, `cargo test`, `go test`) in parallel.
+- **No concurrent builds or code generators**: Never run heavy compilation or generation commands (e.g. `flutter build`, `npm run build`, `dart run build_runner`, compilers) concurrently.
+- **Queue sequentially**: Always queue and run test suites and build gates sequentially (`cmd1 && cmd2`, or await each process before starting the next).
+
+## 7. Legal & Regulatory Compliance (US & California)
 
 **Prevent statutory exposure before writing or shipping features.**
-See full standards in [docs/standards/legal-compliance.md](docs/standards/legal-compliance.md).
+See full standards in [Shir0o/.github/docs/standards/legal-compliance.md](https://github.com/Shir0o/.github/blob/main/docs/standards/legal-compliance.md).
 
 Before introducing new features, enforce these gates:
 - **COPPA (Age Gating)**: If collecting personal info or public user sign-ups, require a neutral age check. Never collect PII from under-13 users without parental consent.
@@ -78,5 +97,5 @@ Before introducing new features, enforce these gates:
 
 ---
 
-**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, zero regulatory compliance gaps, and clarifying questions come before implementation rather than after mistakes.
+**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, zero regulatory compliance gaps, zero video recordings or superfluous captures, and clarifying questions come before implementation rather than after mistakes.
 
