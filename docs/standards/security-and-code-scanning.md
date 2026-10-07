@@ -21,6 +21,9 @@ GitHub provides an extensive set of security features at zero cost for public re
 > [!IMPORTANT]
 > **Strict Cost Guardrail:** Never enable GHAS-dependent features (such as CodeQL or Secret Scanning) on private repositories unless explicitly licensed. Keep private repositories strictly on the 100% free tier (Dependabot alerts and automated security PRs).
 
+> [!NOTE]
+> **GitHub App vs. Workflow Files:** GitHub Copilot Code Review and automated PR security scans are managed as GitHub App configurations in repository/organization settings on GitHub (e.g., Code security and analysis). They do NOT run from local `.github/workflows/*.yml` files. Agents should not attempt to locate, edit, or disable them by modifying workflow YAML files.
+
 ---
 
 ## 2. Onboarding Playbook for Future Repositories

@@ -6,6 +6,11 @@ APP_PACKAGE_NAME = ENV["APP_PACKAGE_NAME"] || "com.example.app"
 # AAB path is supplied by the release workflow via FASTLANE_AAB_PATH
 DEFAULT_AAB_PATH = File.expand_path("../build/app/outputs/bundle/release/app-release.aab", __dir__)
 
+# Release status for internal testing track:
+#   "draft"     — uploads the build without releasing; requires manual confirmation in Play Console.
+#   "completed" — the build reaches internal testers automatically upon upload.
+PLAY_RELEASE_STATUS = ENV["PLAY_RELEASE_STATUS"] || "completed"
+
 # Lane: play_upload
 #
 # Uploads the AAB to the Play Console internal testing track.
@@ -56,7 +61,7 @@ lane :play_upload do |options|
     track: "internal",
     aab: aab_path,
     json_key: "fastlane/play-supply-credentials.json",
-    release_status: "draft",
+    release_status: PLAY_RELEASE_STATUS,
     metadata_path: "fastlane/metadata/android",
     skip_upload_metadata: false,
     skip_upload_changelogs: false,

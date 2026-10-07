@@ -16,6 +16,7 @@ cd ~/.github-repo
 
 | Action | Command | Description |
 | :--- | :--- | :--- |
+| **Run Command Across Repos** | `./scripts/workspace-each.sh [options] -- <cmd>` | Safely execute a command across repos (e.g. `--tier 1 git status -s`). |
 | **Dry Run (Preview)** | `./apply-standards.sh` | Safely preview what would change across all 19 repos without touching files or opening PRs. |
 | **Apply to Single Repo** | `./apply-standards.sh --apply --repo <name>` | Regenerate `AGENTS.md` and sync DevOps files for one specific repository (e.g. `--repo attd`). |
 | **Apply to All Repos** | `./apply-standards.sh --apply` | Apply standards across all repos, create branch `chore/standardize-agent-devops`, commit, and open PRs. |

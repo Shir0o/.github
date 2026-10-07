@@ -95,6 +95,13 @@ Before introducing new features, enforce these gates:
 - **Privacy & CDNs (Google Fonts)**: Self-host web fonts and static resources locally; do not link remote `fonts.googleapis.com` CDNs that leak user IP addresses.
 - **DMCA Safe Harbor**: If hosting user-generated uploads, ensure designated DMCA agent details and takedown procedures are in place.
 
+## 8. Multi-Repo & Environment Conventions
+
+- **Organization Standards**: Canonical org templates, rulesets, and DevOps tooling live at `~/.github-repo/` (not `~/.github/`).
+- **Reactive Wakeup**: After dispatching background tasks or long-running CI watches, stop calling tools. Never poll `manage_task status` in a loop; the environment notifies upon completion.
+- **GitHub Apps vs Workflows**: Copilot Code Review and org-level automated scans are GitHub App / repository settings, not in-repo `.github/workflows/` YAML files. Do not grep workflows to disable them.
+- **Squash-Merge on Protected Branches**: When merging approved automated chore PRs on repos with branch protection rulesets, use `gh pr merge <num> --squash --admin --delete-branch`.
+
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, zero regulatory compliance gaps, zero video recordings or superfluous captures, and clarifying questions come before implementation rather than after mistakes.
