@@ -67,20 +67,22 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 **Screenshots only for visual changes (1–2 of final state). Never record video. Skip captures for logic.**
 
-- **Logic-only tasks**: Skip all captures and app launches altogether. Verify exclusively through automated test suites, compiler/type checks, linting, and static analysis.
+- **Logic-only tasks**: Skip all captures and app launches altogether. Verify locally through compiler/type checks, linting, and static analysis. Offload full test suites and coverage runs to GitHub CI.
 - **Visual changes (shapes, effects, UI)**:
   - Take **1–2 screenshots of the final state only** to confirm what changed on screen.
   - **No videos or screen recordings**, and do not capture every combination or intermediate state.
   - The user performs a short manual playtest at milestones (e.g. after a ticket lands), rather than agents recording or continuously running the app.
 
-## 6. Sequential CPU-Intensive Operations & Tests
+## 6. CPU Conservation & GitHub CI Test Delegation
 
-**Never run tests or heavy operations concurrently. Run them sequentially.**
+**Do not run full test suites locally. Let GitHub CI handle tests.**
 
-To prevent host resource exhaustion, thermal throttling, process timeouts, and lock contention:
-- **No concurrent test runs**: Never execute test commands (e.g. `flutter test`, `npm test`, `jest`, `pytest`, `cargo test`, `go test`) in parallel.
-- **No concurrent builds or code generators**: Never run heavy compilation or generation commands (e.g. `flutter build`, `npm run build`, `dart run build_runner`, compilers) concurrently.
-- **Queue sequentially**: Always queue and run test suites and build gates sequentially (`cmd1 && cmd2`, or await each process before starting the next).
+Running comprehensive test suites locally consumes excessive CPU, triggers thermal throttling, and wastes local cycles. All repositories run full test matrices in GitHub Actions CI:
+- **No full test runs locally**: Do not run full test suites (e.g. `flutter test`, `npm test`, `jest`, `pytest`, `cargo test`, `go test`, or coverage runs) locally before opening a pull request.
+- **Lightweight local gates only**: Local verification prior to pushing is strictly limited to fast static checks: typechecking (`tsc --noEmit`, `flutter analyze`), linting (`eslint`, `dart analyze`), and formatting checks.
+- **Targeted single tests during TDD**: If writing a unit test for a bug reproduction or new seam, you may execute *only that specific test file* if strictly needed to verify behavior. Never execute the broader suite.
+- **Push and let CI verify**: Push the branch, open the PR, and monitor GitHub Actions (`gh pr checks <pr> --watch`). If and only if CI fails, inspect the failing job log and fix the targeted issue.
+- **Sequential execution for any local heavy tasks**: Any remaining required local heavy tasks (e.g. build steps or code generators) must strictly run sequentially (`cmd1 && cmd2`), never concurrently.
 
 ## 7. Legal & Regulatory Compliance (US & California)
 
