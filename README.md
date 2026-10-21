@@ -26,24 +26,25 @@ cd ~/.github-repo
 ### 2. Updating Standards (Step-by-Step Playbooks)
 
 #### A. Updating a Global Agent Rule (All Repos)
-When you want to update global behavioral guidelines, TDD rules, or token/cost rules:
+Global agent rules use a **Global Single Source of Truth**:
+`templates/base-agents.md` is host-symlinked directly to `~/.claude/CLAUDE.md` and `~/.gemini/GEMINI.md`.
+
+When you want to update global behavioral guidelines, TDD rules, CPU conservation, or legal standards:
 
 ```bash
 cd ~/.github-repo
 
 # 1. Edit the shared base template
+# Changes take effect IMMEDIATELY across all local agents, sessions, and repos without opening PRs!
 nano templates/base-agents.md
 
-# 2. Preview the diff across all repos
-./apply-standards.sh
-
-# 3. Apply changes and open PRs across all repos
-./apply-standards.sh --apply
-
-# 4. Commit and push the template update to Shir0o/.github
-git commit -am "feat: update global agent TDD rules"
+# 2. Commit and push the template update to Shir0o/.github
+git commit -am "feat: update base agent rules"
 git push origin main
 ```
+
+> [!NOTE]
+> You do **not** need to run `apply-standards.sh` across all repositories for agent rule updates. `apply-standards.sh` is reserved for repo onboarding or DevOps infrastructure sync (CODEOWNERS, dependabot, rulesets).
 
 #### B. Updating a Project-Specific Rule (1 Repo)
 When adding instructions specific to one app (e.g. skeleton loaders for `attd`, Godot recording in `idle`):
