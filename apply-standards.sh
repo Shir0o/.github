@@ -351,16 +351,32 @@ apply_ci_template() {
 }
 
 # ─── Apply CodeQL ─────────────────────────────────────────────────────────────
+# NOTE: We do NOT deploy a custom codeql.yml workflow.
+# GitHub's default CodeQL setup (free for all public repos) handles scanning
+# automatically. Deploying a custom workflow conflicts with default setup and
+# causes "CodeQL analyses from advanced configurations cannot be processed
+# when the default setup is enabled" errors.
+# Enable default setup per-repo at: Settings → Code security → CodeQL analysis
 
 apply_codeql() {
   local repo_dir="$1" framework="$2" has_functions="$3"
   local workflows_dir="$repo_dir/.github/workflows"
+  local codeql_file="$workflows_dir/codeql.yml"
 
-  # CodeQL for: node repos, or flutter repos with functions/
-  if [[ "$framework" == "node" ]] || [[ "$framework" == "eleventy" ]] || [[ "$has_functions" == "yes" ]]; then
-    install_file "$TEMPLATES/codeql.yml" "$workflows_dir/codeql.yml"
+  # Remove any stale custom codeql.yml — GitHub default setup supersedes it
+  if $DRY_RUN; then
+    if [[ -f "$codeql_file" ]]; then
+      log "WOULD REMOVE codeql.yml (conflicts with GitHub default setup)"
+    else
+      skip "codeql.yml (not present)"
+    fi
   else
-    skip "CodeQL (pure $framework, no JS/TS)"
+    if [[ -f "$codeql_file" ]]; then
+      rm "$codeql_file"
+      log "Removed codeql.yml (GitHub default setup is active)"
+    else
+      skip "codeql.yml (not present)"
+    fi
   fi
 }
 
@@ -481,12 +497,14 @@ create_branch_and_pr() {
     ".github/CODEOWNERS"
     ".github/dependabot.yml"
     ".github/workflows/ci.yml"
-    ".github/workflows/codeql.yml"
     ".github/rulesets/main-branch-protection.json"
   )
   for f in "${standard_files[@]}"; do
     [[ -f "$f" ]] && git add -f "$f"
   done
+
+  # Stage codeql.yml deletion (apply_codeql removes it; default setup handles scanning)
+  git rm --cached ".github/workflows/codeql.yml" 2>/dev/null || true
 
   # Also stage deletions of old files
   for f in "GEMINI.md" "CLAUDE.md" "agents.md" ".agents/AGENTS.md" "CHANGELOG.md"; do
