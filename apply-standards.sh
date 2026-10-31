@@ -56,6 +56,7 @@ REPOS=(
   "wave|1|flutter|no|Shir0o/wave"
   "road-song|1|flutter|no|Shir0o/road-song"
   "idle-flame|1|flutter|no|Shir0o/idle-flame"
+  "tempo|1|flutter|no|Shir0o/tempo"
   # ── Tier 2 ──────────────────────────────────────────────────────────────────
   "budget|2|flutter|no|Shir0o/budget"
   "sleep-journal|2|flutter|no|Shir0o/sleep-journal"
