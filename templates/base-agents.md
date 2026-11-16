@@ -103,7 +103,7 @@ Before introducing new features, enforce these gates:
 - **Reactive Wakeup**: After dispatching background tasks or long-running CI watches, stop calling tools. Never poll `manage_task status` in a loop; the environment notifies upon completion.
 - **GitHub Apps vs Workflows**: Copilot Code Review and org-level automated scans are GitHub App / repository settings, not in-repo `.github/workflows/` YAML files. Do not grep workflows to disable them.
 - **Squash-Merge on Protected Branches**: When merging approved automated chore PRs on repos with branch protection rulesets, use `gh pr merge <num> --squash --admin --delete-branch`.
-- **OpenCode Delegation**: You can utilize `opencode` on this machine to delegate tasks with DeepSeek V4.1 Flash (`opencode run -m opencode-go/deepseek-v4.1-flash --auto "<prompt>"`).
+- **OpenCode Delegation**: You can utilize `opencode` on this machine to delegate tasks with the latest DeepSeek Flash model (e.g. `opencode run -m opencode-go/deepseek-v4.1-flash --auto "<prompt>"`; check `opencode models` for the latest `deepseek-*-flash`).
 
 ---
 
